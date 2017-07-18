@@ -45,47 +45,69 @@ app.get('/', function(req, res) {
 
 // get all books
 app.get('/api/books', function index(req, res) {
+
   // send all books as JSON response
-  db.Book.find(function(err, books) {
-    if (err) {
-      console.log("index error: " + err);
-      res.sendStatus(500);
-    }
-    res.json(books);
-  });
+  db.Book.find()
+    // populate fills in the author id with all the author data
+    .populate('author')
+    .exec(function(err, books) {
+      if (err) {
+        return console.log("index error: " + err);
+        res.sendStatus(500);
+      }
+      res.json(books);
+    })
 });
 
 // get one book
 app.get('/api/books/:id', function show(req, res) {
+
   // find one book by its id
   var bookId = req.params.id;
   console.log('books show', bookId);
 
   //find book by id method
-  db.Book.findById(bookId, function (err, foundBook){
-    if (err) {
-      console.log("index error: " + err);
-      res.sendStatus(500);
-    }
-    res.json(foundBook);
-  });
-});
-
-// create new book
-app.post('/api/books', function create(req, res) {
-  // create new book with form data (`req.body`)
-  var newBook = req.body;
-  console.log('books create', req.body);
-
-  //create method
-  let book = new db.Book(newBook);
-    book.save(function(err, savedBook){
+  db.Book.findById(bookId)
+    .populate('author')
+    .exec(function(err, foundBook) {
       if (err) {
         console.log("index error: " + err);
         res.sendStatus(500);
       }
-      res.json(savedBook);
+      res.json(foundBook);
     });
+
+});
+
+// create new book
+app.post('/api/books', function create(req, res) {
+
+  // create new book with form data (`req.body`)
+  var newBook = new db.Book({
+    title: req.body.title,
+    image: req.body.image,
+    releaseDate: req.body.releaseDate
+  });
+  console.log('books create', req.body);
+
+  // create method
+  // this code will only add an author to a book if the author already exists
+  db.Author.findOne({name: req.body.author}, function(err, author) {
+    if (err) {
+      return console.log(err);
+    }
+    // add author to book
+    newBook.author = author;
+    // add newBook to database
+    newBook.save(function(err, book) {
+      if (err) {
+        return console.log("create error: " + err);
+      }
+      console.log("created ", book.title);
+      res.json(book);
+    });
+  });
+
 });
 
 // delete book
@@ -95,13 +117,14 @@ app.delete('/api/books/:id', function destroy(req, res) {
   console.log('deleting book with index', bookId);
 
   // destroy method
-  db.Book.findByIdAndRemove(bookId, function (err, deleteBook){
+  db.Book.findOneAndRemove({_id: bookId}, function(err, deleteBook) {
     if (err) {
       res.sendStatus(500);
       console.log("index error: " + err);
     }
     res.json(deleteBook);
   });
+
 });
 
 
