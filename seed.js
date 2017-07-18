@@ -84,6 +84,10 @@ var authors_list = [{
   {
     name: "William Shakespeare",
     alive: false
+  },
+  {
+    name: "Jane Austen",
+    alive: false
   }
 ];
 

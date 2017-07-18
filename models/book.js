@@ -1,6 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var CharacterSchema = new Schema({
+  name: String
+});
+
 var BookSchema = new Schema({
   title: String,
   author: {
@@ -8,8 +12,8 @@ var BookSchema = new Schema({
     ref: 'Author'
   },
   image: String,
-  releaseDate: String
-  // you should fill the rest of this in
+  releaseDate: String,
+  characters: [CharacterSchema]
 });
 
 var Book = mongoose.model('Book', BookSchema);

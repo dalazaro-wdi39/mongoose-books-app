@@ -91,8 +91,9 @@ app.post('/api/books', function create(req, res) {
   console.log('books create', req.body);
 
   // create method
-  // this code will only add an author to a book if the author already exists
-  db.Author.findOne({name: req.body.author}, function(err, author) {
+  db.Author.findOne({
+    name: req.body.author
+  }, function(err, author) {
     if (err) {
       return console.log(err);
     }
@@ -117,14 +118,43 @@ app.delete('/api/books/:id', function destroy(req, res) {
   console.log('deleting book with index', bookId);
 
   // destroy method
-  db.Book.findOneAndRemove({_id: bookId}, function(err, deleteBook) {
+  db.Book.findOneAndRemove({
+    _id: bookId
+  }, function(err, deleteBook) {
     if (err) {
-      res.sendStatus(500);
+      res.status(500);
       console.log("index error: " + err);
     }
     res.json(deleteBook);
   });
 
+});
+
+// Create a character associated with a book
+app.post('/api/books/:book_id/characters', function(req, res) {
+
+  // Get book id from url params (`req.params`)
+  var bookId = req.params.book_id;
+
+  //find book to add characters
+  db.Book.findById(bookId)
+    .populate('author')
+    .exec(function(err, foundBook) {
+      if (err) {
+        return console.log("create error: " + err);
+        res.status(500);
+      } else if (foundBook === null) {
+        res.status(404).json({
+          error: "No Book found by this ID"
+        });
+      } else {
+        // push character into characters array
+        foundBook.characters.push(req.body);
+        // save the book with the new character
+        foundBook.save();
+        res.status(201).json(foundBook);
+      }
+    });
 });
 
 
