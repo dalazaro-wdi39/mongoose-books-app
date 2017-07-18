@@ -32,21 +32,9 @@ var db = require('./models')
 
 
 
-
-// var newBookUUID = 18;
-
-
-
-
-
-
-
 ////////////////////
 //  ROUTES
 ///////////////////
-
-
-
 
 // define a root route: localhost:3000/
 app.get('/', function(req, res) {
@@ -100,25 +88,6 @@ app.post('/api/books', function create(req, res) {
     });
 });
 
-// // update book
-// app.put('/api/books/:id', function update(req, res) {
-//   // get book id from url params (`req.params`)
-//   var bookId = req.params.id;
-//   console.log('books update', req.params);
-//   var updateBook = req.body;
-//   console.log('updated info', req.body);
-//
-//   //update book
-//   db.Book.update({_id: bookId}, function (err, updateBook) {
-//     if (err) {
-//       res.sendStatus(500);
-//       console.log("index error: " + err);
-//     }
-//     res.json(updateBook);
-//   });
-//
-// });
-
 // delete book
 app.delete('/api/books/:id', function destroy(req, res) {
   // get book id from url params (`req.params`)
@@ -134,7 +103,6 @@ app.delete('/api/books/:id', function destroy(req, res) {
     res.json(deleteBook);
   });
 });
-
 
 
 app.listen(process.env.PORT || 3000, function() {
